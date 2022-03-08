@@ -8,7 +8,6 @@ function UserProfile() {
   const { authUser } = useContext(Context)
   const router = useRouter();
 
-
   useEffect(() => {
     if (!authUser) {
       router.push('/auth')
