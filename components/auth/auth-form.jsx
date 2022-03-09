@@ -17,6 +17,7 @@ function AuthForm() {
   }
 
   const loginUser = async (e) => {
+    e.preventDefault();
     setError(null)
     signInWithEmailAndPassword(emailRef.current.value, passwordRef.current.value)
       .then(authUser => {
@@ -25,10 +26,10 @@ function AuthForm() {
       .catch(error => {
         setError(error.message)
       });
-    e.preventDefault();
   };
 
   const registerUser = async (e) => {
+    e.preventDefault();
     setError(null)
     createUserWithEmailAndPassword(emailRef.current.value, passwordRef.current.value)
       .then(authUser => {
@@ -37,7 +38,6 @@ function AuthForm() {
       .catch(error => {
         setError(error.message)
       });
-    e.preventDefault();
   };
 
   return (

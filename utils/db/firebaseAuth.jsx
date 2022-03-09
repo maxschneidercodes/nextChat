@@ -33,14 +33,22 @@ export default function useFirebaseAuth() {
         setLoading(true);
     };
 
-    const signInWithEmailAndPassword = (email, password) =>
-        firebase.auth().signInWithEmailAndPassword(email, password);
+    function resetPassword(newPassword) {
+        var user = firebase.auth().currentUser;
+        return user.updatePassword(newPassword)
+    }
 
-    const createUserWithEmailAndPassword = (email, password) =>
-        firebase.auth().createUserWithEmailAndPassword(email, password);
+    function signInWithEmailAndPassword(email, password) {
+        return firebase.auth().signInWithEmailAndPassword(email, password);
+    }
 
-    const signOut = () =>
+    function createUserWithEmailAndPassword(email, password) {
+        return firebase.auth().createUserWithEmailAndPassword(email, password);
+    }
+
+    function signOut() {
         firebase.auth().signOut().then(clear);
+    }
 
     useEffect(() => {
         const unsubscribe = firebase.auth().onAuthStateChanged(authStateChanged);
@@ -52,6 +60,7 @@ export default function useFirebaseAuth() {
         loading,
         signInWithEmailAndPassword,
         createUserWithEmailAndPassword,
-        signOut
+        signOut,
+        resetPassword
     };
 }
