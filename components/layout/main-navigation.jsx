@@ -12,7 +12,7 @@ function MainNavigation() {
     <header className={classes.header}>
       <Link href='/'>
         <a>
-          <div className={classes.logo}>Next Auth</div>
+          <div className={classes.logo}>nextChat</div>
         </a>
       </Link>
       <nav>
@@ -20,9 +20,6 @@ function MainNavigation() {
           <li>
 
             {authUser ? null : <Link href='/auth'>Login</Link>}
-          </li>
-          <li>
-            {authUser ? <Link href='/profile'>Profile</Link> : null}
           </li>
           <li>
             {authUser ? <button onClick={signOut}>Logout</button> : null}

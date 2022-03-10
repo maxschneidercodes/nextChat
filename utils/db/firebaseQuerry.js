@@ -5,17 +5,11 @@ const COLLECTION_ID_Rooms = "rooms"
 const COLLECTION_ID_Users = "users"
 const COLLECTION_ID_MESSAGES = "messages"
 
-async function userHasRoom(userID) {
-    const roomRef = await db.collection(COLLECTION_ID_Users).doc(userID).get()
-    return roomRef.exists
-}
 
 export async function createRoom(userID) {
-    // if (userHasRoom(userID)) {
     const roomRef = db.collection(COLLECTION_ID_Rooms).doc()
     await roomRef.set({});
     await saveRoomIDinUser(roomRef.id, userID)
-        //     }
 }
 
 async function saveRoomIDinUser(roomID, userId) {
@@ -24,9 +18,11 @@ async function saveRoomIDinUser(roomID, userId) {
 
 export async function getRoom(userId) {
     const roomRef = await db.collection(COLLECTION_ID_Users).get()
-    let room
+    let room = ""
     roomRef.forEach(doc => {
-        room = doc.data().roomId
+        if (doc.id === userId) {
+            room = doc.data().roomId
+        }
     });
     return room
 }

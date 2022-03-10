@@ -21,7 +21,7 @@ function AuthForm() {
     setError(null)
     signInWithEmailAndPassword(emailRef.current.value, passwordRef.current.value)
       .then(authUser => {
-        router.push('/profile');
+        router.push('/');
       })
       .catch(error => {
         setError(error.message)
@@ -33,7 +33,7 @@ function AuthForm() {
     setError(null)
     createUserWithEmailAndPassword(emailRef.current.value, passwordRef.current.value)
       .then(authUser => {
-        router.push("/profile");
+        router.push("/");
       })
       .catch(error => {
         setError(error.message)

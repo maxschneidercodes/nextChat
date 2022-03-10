@@ -1,57 +1,78 @@
 import classes from './user-profile.module.css';
-import { Fragment, useContext, useEffect, useState } from 'react';
+import { Fragment, useContext, useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/router';
 import { Context } from '../../context/context';
-import { createRoom, getRoom } from "../../utils/db/firebaseQuerry"
+import { createRoom, getRoom, loadMessages, postMessage } from "../../utils/db/firebaseQuerry"
 
 function UserProfile() {
   const { authUser } = useContext(Context)
   const router = useRouter();
-  const [chatRoom, setChatRoom] = useState()
+  const [chatRoomID, setChatRoomID] = useState()
+  const [loading, setLoading] = useState(true)
+  const buttonRef = useRef()
+  const textInputRef = useRef()
+  const [messages, setMessages] = useState()
 
   useEffect(() => {
+    setLoading(true)
     if (!authUser) {
       router.push('/auth')
     }
-    if (authUser) {
+    loadRoom()
+  }, [authUser])
 
+
+  function loadRoom() {
+    if (authUser) {
       (async function () {
         try {
+          if (!chatRoomID) {
+            await createRoom(authUser.uid)
+          }
           let chatRoomId = await getRoom(authUser.uid)
-          console.log(chatRoomId)
-          setChatRoom(chatRoomId)
+          setChatRoomID(chatRoomId)
+          setMessages(await loadChat(chatRoomId))
+          setLoading(false)
         } catch (e) {
           console.error(e);
         }
       })();
     }
-  }, [authUser])
+  }
 
-  if (!authUser) {
+
+  if (!authUser || loading) {
     return <Fragment>
-      <p>Loading...</p>
+      <p style={{ textAlign: "center", }}>Loading...</p>
     </Fragment>
   }
 
-  function createChatRoome(e) {
+  function loadChat(chatRoomId) {
+    return loadMessages(chatRoomId)
+  }
+
+  let messagesHTML = messages.map(msg => {
+    return <p>{msg.message}</p>
+  })
+
+  async function sendMessage(e) {
     e.preventDefault()
-    chatRoomcreateRoom(authUser.uid)
+    await postMessage(chatRoomID, { message: textInputRef.current.value })
+    loadRoom()
   }
 
   return (
-    <Fragment>
+    <div style={{ textAlign: "center", }}>
       <section className={classes.profile}>
         <h2>Hello {authUser.email}</h2>
-        <form onSubmit={createChatRoome}>
-          <button >create Chatroom</button>
-        </form>
-        <form>
-          <input placeholder='id' type="text"></input>
-          <button>join Chatroom</button>
+        <h3>chatRoom ID: {chatRoomID}</h3>
+        {messagesHTML}
+        <form onSubmit={sendMessage}>
+          <input ref={textInputRef} type="text"></input>
+          <button>send</button>
         </form>
       </section>
-      <button>join {chatRoom}</button>
-    </Fragment>
+    </div >
   );
 }
 

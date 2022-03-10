@@ -1,5 +1,8 @@
-import StartingPageContent from '../components/starting-page/starting-page';
+import UserProfile from '../components/profile/user-profile';
 
-export default function HomePage() {
-    return <StartingPageContent />;
+
+function ProfilePage() {
+    return <UserProfile />
 }
+
+export default ProfilePage;
