@@ -1,14 +1,5 @@
 import StartingPageContent from '../components/starting-page/starting-page';
 
-export default function HomePage(props) {
+export default function HomePage() {
     return <StartingPageContent />;
-}
-
-export async function getStaticProps(context) {
-
-    return {
-        props: {
-            user: []
-        }
-    }
 }
