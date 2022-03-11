@@ -18,7 +18,9 @@ function MainNavigation() {
       <nav>
         <ul>
           <li>
-
+            {authUser ? <Link href='/join'>Join Chat</Link> : null}
+          </li>
+          <li>
             {authUser ? null : <Link href='/auth'>Login</Link>}
           </li>
           <li>
