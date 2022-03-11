@@ -7,11 +7,11 @@ import { createRoom, getRoom, loadMessages, postMessage } from "../../utils/db/f
 function UserProfile() {
   const { authUser } = useContext(Context)
   const router = useRouter();
-  const [chatRoomID, setChatRoomID] = useState()
+  const [chatRoomID, setChatRoomID] = useState(null)
   const [loading, setLoading] = useState(true)
-  const buttonRef = useRef()
   const textInputRef = useRef()
-  const [messages, setMessages] = useState()
+  const joinTextRef = useRef()
+  const [messages, setMessages] = useState([])
 
   useEffect(() => {
     setLoading(true)
@@ -21,19 +21,33 @@ function UserProfile() {
     loadRoom()
   }, [authUser])
 
+  async function handleRoomCreate(e) {
+    e.preventDefault()
+    await createRoom(authUser.uid)
+    let chatRoomId = await getRoom(authUser.uid)
+    setChatRoomID(chatRoomId)
+    setMessages(await loadMessages(chatRoomId))
+    setLoading(false)
+  }
+
+  async function handleJoinChatRoom(e) {
+    e.preventDefault()
+    setLoading(true)
+    setChatRoomID(joinTextRef.current.value)
+    setMessages(await loadMessages(joinTextRef.current.value))
+    setLoading(false)
+  }
 
   function loadRoom() {
     if (authUser) {
       (async function () {
         try {
-          if (!chatRoomID) {
-            await createRoom(authUser.uid)
-          }
           let chatRoomId = await getRoom(authUser.uid)
           setChatRoomID(chatRoomId)
-          setMessages(await loadChat(chatRoomId))
+          setMessages(await loadMessages(chatRoomId))
           setLoading(false)
         } catch (e) {
+          setLoading(false)
           console.error(e);
         }
       })();
@@ -47,26 +61,40 @@ function UserProfile() {
     </Fragment>
   }
 
-  function loadChat(chatRoomId) {
-    return loadMessages(chatRoomId)
-  }
-
   let messagesHTML = messages.map(msg => {
-    return <p>{msg.message}</p>
+    return <div key={Math.random()}>
+      <li>{msg.message}</li>
+    </div>
   })
 
   async function sendMessage(e) {
-    e.preventDefault()
-    await postMessage(chatRoomID, { message: textInputRef.current.value })
-    loadRoom()
+    if (authUser) {
+      e.preventDefault()
+      await postMessage(chatRoomID, { message: textInputRef.current.value })
+      loadRoom()
+    }
   }
 
   return (
     <div style={{ textAlign: "center", }}>
       <section className={classes.profile}>
         <h2>Hello {authUser.email}</h2>
-        <h3>chatRoom ID: {chatRoomID}</h3>
-        {messagesHTML}
+        {chatRoomID ? null : <form>
+          <button onClick={handleRoomCreate}>create Chatroom</button>
+        </form>}
+        <form>
+          <input ref={joinTextRef} type="text"></input>
+          <button onClick={handleJoinChatRoom}>join Chatroom</button>
+
+        </form>
+        <br />
+        <h2>Your ChatRoom</h2>
+        <h3>chatRoomID: {chatRoomID}</h3>
+        <div style={{ display: "flex", justifyContent: "center" }}>
+          <ul style={{ listStyleType: "none", height: "500px", width: "50%", overflow: "hidden", overflowY: "scroll" }}>
+            {messagesHTML}
+          </ul>
+        </div>
         <form onSubmit={sendMessage}>
           <input ref={textInputRef} type="text"></input>
           <button>send</button>
